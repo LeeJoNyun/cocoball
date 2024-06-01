@@ -22,10 +22,4 @@ public class UserController {
         return ResponseEntity.ok().body("ok");
     }
 
-    @PostMapping("/user/login")
-    public ResponseEntity<String> login(@Valid JoinDTO dto){
-        return ResponseEntity.ok().body("hi");
-    }
-
-
 }

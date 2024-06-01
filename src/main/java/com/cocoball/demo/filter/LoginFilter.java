@@ -1,5 +1,7 @@
 package com.cocoball.demo.filter;
 
+import com.cocoball.demo.dto.CustomUserDetails;
+import com.cocoball.demo.jwt.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,32 +15,47 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
-    // UsernamePasswordAuthenticationFilter 상속 받아서 선언하는 이유
-    // 기본적으로 사용자 이름과 비밀번호 기반의 인증을 처리한다.
-    // 인증 성공 후 JWT 토큰을 발행하여 클라이언트에게 반환하는 로직을 추가 할 수 있다.
 
     private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
-    public LoginFilter(AuthenticationManager authenticationManager) {
+
+    public LoginFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
+        this.jwtUtil =  jwtUtil;
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
-        String username = obtainUsername(request); // obtainUsername은 Spring Security에서 사용자가 제공한 인증 정보에서 사용자 이름을 추출한다
+        // request에서 username, password를 받아온다.
+        String username = obtainUsername(request);
         String password = obtainPassword(request);
-        System.out.println(username);
-        // 넘어온 정보를 검증하기 위해 token에 담는다
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
 
-        // AuthenticationManager에 token 을 전달(Spring Security에서 검증한다)
-        return authenticationManager.authenticate(token);
+        // authenticationManager에서 검증하기 위한 토큰을 생성한다.
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password, null);
 
+        return authenticationManager.authenticate(authToken);
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        System.out.println("success");
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication auth) throws IOException, ServletException {
+        // 검증된 계정으로 회원정보를 담은 jwt 토큰을 반환한다.
+
+        CustomUserDetails details = (CustomUserDetails) auth.getPrincipal();
+
+        String username = details.getUsername();
+        int birth = details.getBirth();
+        int avg = details.getAvg();
+
+        String token = jwtUtil.createJwt(username, birth, avg, 60*60*10L);
+
+        response.setHeader("Authorization", "Bearer "+token);
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        response.setStatus(401);
     }
 }
+

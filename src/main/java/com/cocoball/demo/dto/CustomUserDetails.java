@@ -4,6 +4,7 @@ import com.cocoball.demo.entity.UserEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 // 'UserDetails'를 인터페이스로 사용하는 이유
@@ -19,6 +20,7 @@ public class CustomUserDetails implements UserDetails {
         // 사용자 권한 반환
         // 사용 안함
         return null;
+       return null;
     }
 
     @Override
@@ -56,4 +58,14 @@ public class CustomUserDetails implements UserDetails {
         // 사용자 활성화 여부 반환
         return true;
     }
+
+    //사용자 생년월일 반환
+    public int getBirth(){
+        return userEntity.getBirth();
+    }
+    //사용자 에버 반환
+    public int getAvg() {
+        return userEntity.getAvg();
+    }
+
 }

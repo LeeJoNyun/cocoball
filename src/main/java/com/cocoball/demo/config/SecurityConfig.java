@@ -18,9 +18,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
     private final AuthenticationConfiguration configuration;
+    private final JwtUtil jwtUtil;
 
-    public SecurityConfig(AuthenticationConfiguration configuration) {
+    public SecurityConfig(AuthenticationConfiguration configuration, JwtUtil jwtUtil) {
         this.configuration = configuration;
+        this.jwtUtil = jwtUtil;
     }
 
     @Bean
@@ -49,8 +51,9 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
 
                 )
-                .addFilterAt(new LoginFilter(authenticationManager(configuration)), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(new LoginFilter(authenticationManager(configuration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 // UsernamePasswordAuthenticationFilter자리에 LoginFilter를 사용하겠다는 의미
+//                .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class)
                 .sessionManagement(
                         conf -> conf.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );

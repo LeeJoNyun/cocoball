@@ -6,8 +6,9 @@ import com.cocoball.demo.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-
+@Service
 public class CustomUserDetailsService implements UserDetailsService {
 //사용자 인증을 처리하는 class
 

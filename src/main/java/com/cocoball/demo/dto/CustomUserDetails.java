@@ -19,7 +19,6 @@ public class CustomUserDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 사용자 권한 반환
         // 사용 안함
-        return null;
        return null;
     }
 

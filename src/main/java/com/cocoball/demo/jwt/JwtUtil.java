@@ -32,6 +32,16 @@ public class JwtUtil {
                 .get("username", String.class); // 페이로드에서 'username' 클레임 값을 추출하고, String.class를 사용하여 문자열로 변환한다.
     }
 
+    // 토큰 만료 확이느
+    public Boolean isExpired(String token){
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration()
+                .before(new Date());
+    }
     // 생년월일 조회
     public int getBirth(String token){
         return Jwts.parser()
@@ -50,6 +60,7 @@ public class JwtUtil {
                 .getPayload()
                 .get("avg", Integer.class);
     }
+
     // 토큰 생성
     public String createJwt(String username, int birth, int avg, Long expiredMs){
         return Jwts.builder() // JWT생성을 위한 빌더 객체를 생성한다.
@@ -61,4 +72,6 @@ public class JwtUtil {
                 .signWith(key) // JWT에 서명을 추가한다.
                 .compact(); // 설정이 완료된 JWT를 직렬화 한다.
     }
+
+
 }
